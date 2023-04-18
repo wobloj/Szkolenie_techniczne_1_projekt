@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import javafx.scene.image.Image;
 
 
 /**
@@ -17,10 +18,14 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"));
+        scene = new Scene(loadFXML("primary"),600, 400);
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.setTitle("Kantor walut");
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
         stage.show();
+        String css = this.getClass().getResource("styles/style.css").toExternalForm();
+        scene.getStylesheets().add(css);
     }
 
     static void setRoot(String fxml) throws IOException {

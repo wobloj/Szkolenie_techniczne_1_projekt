@@ -30,7 +30,7 @@ public class PrimaryController {
     
     @FXML
     public void initialize(){
-        String[] viaLocales = { "JPY", "CNY", "SDG", "RON", "MKD", "MXN", "CAD",
+        String[] isoCurrencies = { "JPY", "CNY", "SDG", "RON", "MKD", "MXN", "CAD",
         "ZAR", "AUD", "NOK", "ILS", "ISK", "SYP", "LYD", "UYU", "YER", "CSD",
         "EEK", "THB", "IDR", "LBP", "AED", "BOB", "QAR", "BHD", "HNL", "HRK",
         "COP", "ALL", "DKK", "MYR", "SEK", "RSD", "BGN", "DOP", "KRW", "LVL",
@@ -40,30 +40,25 @@ public class PrimaryController {
         "SKK", "GTQ", "BRL", "EUR", "HUF", "IQD", "CRC", "PHP", "SVC", "PLN",
         "USD" };
         
-        tableCurrency.setCellValueFactory(
-                new PropertyValueFactory<>("Waluta"));
-        tableRate.setCellValueFactory(
-                new PropertyValueFactory<>("Cena"));
         
-        
-        table.getItems().addAll(viaLocales);
-        
-        
-        calculateFromList.setItems(FXCollections.observableArrayList(viaLocales).sorted());
-        calculateToList.setItems(FXCollections.observableArrayList(viaLocales).sorted());
+        calculateFromList.setItems(FXCollections.observableArrayList(isoCurrencies).sorted());
+        calculateToList.setItems(FXCollections.observableArrayList(isoCurrencies).sorted());
     }
+    
 
+    
     @FXML
     private void calculateCurrency() throws IOException {
+        BigDecimal amount = BigDecimal.valueOf(Double.valueOf(calculateFrom.getText()));
+        
         if(calculateFrom.getText().isEmpty()){
             rates.setText("Uzupełnij pole");
             return;
         }
-        BigDecimal amount = BigDecimal.valueOf(Double.valueOf(calculateFrom.getText()));
+        
         
         String listConvertTo = calculateToList.getValue();        
         String listConvertFrom = calculateFromList.getValue();
-
         
         String urlString = "https://api.exchangerate.host/convert?from="+ listConvertFrom +"&to="+ listConvertTo +"&amount="+ amount;
         
@@ -72,6 +67,7 @@ public class PrimaryController {
             .url(urlString)
             .get()
             .build();
+
         
         Response response = client.newCall(request).execute();
         String stringResponse = response.body().string(); 
@@ -84,5 +80,10 @@ public class PrimaryController {
         rates.setText("1 " + listConvertFrom + " = "+String.format("%.2f",rate)+ " " + listConvertTo);
         
         calculateTo.setText(String.format("%.2f",calculatedCurrency));
+    }
+    
+    @FXML
+    private void back() throws IOException {
+        App.setRoot("primary");
     }
 }

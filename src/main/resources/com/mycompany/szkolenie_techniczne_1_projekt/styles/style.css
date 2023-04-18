@@ -1,0 +1,27 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 18 kwi 2023, 17:27:39
+    Author     : Wiktor
+*/
+
+/* CSS */
+.root {
+  -fx-background: white;
+}
+
+.button {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-background-radius: 0px;
+    -fx-border-color: black;
+}
+
+.button:hover{
+    -fx-border-color: #ff6600;
+    -fx-text-fill: #ff6600;
+}
+
+
