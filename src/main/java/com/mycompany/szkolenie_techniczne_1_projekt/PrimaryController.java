@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -33,6 +37,8 @@ public class PrimaryController {
     @FXML
     private TableColumn<Currencies, BigDecimal> tableRate;    
     
+    private Task<ObservableList<Currencies>> task;
+    
     public String[] currencies = { "JPY", "CNY", "SDG", "RON", "MKD", "MXN", "CAD",
         "ZAR", "AUD", "NOK", "ILS", "ISK", "SYP", "LYD", "UYU", "YER", "CSD",
         "EEK", "THB", "IDR", "LBP", "AED", "BOB", "QAR", "BHD", "HNL", "HRK",
@@ -46,50 +52,61 @@ public class PrimaryController {
     @FXML
     public void initialize() throws IOException{
         
-        
-        
         calculateFromList.setItems(FXCollections.observableArrayList(currencies).sorted());
         calculateToList.setItems(FXCollections.observableArrayList(currencies).sorted());
 
-    }
-
-    private ObservableList<Currencies> getCurrencies() throws IOException{
- 
+        tableLp.setCellValueFactory(new PropertyValueFactory<>("lp"));
+        tableCurrency.setCellValueFactory(new PropertyValueFactory<>("currencies"));
+        tableRate.setCellValueFactory(new PropertyValueFactory<>("rate"));
+        
         ObservableList<Currencies> list = FXCollections.observableArrayList();
         
-        for(int i=0; i < currencies.length; i++){
-            String urlString = "https://api.exchangerate.host/convert?from="+ currencies[i] +"&to=PLN&amount=1";
-
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder()
-                .url(urlString)
-                .get()
-                .build();
-
-            Response response = client.newCall(request).execute();
-            String stringResponse = response.body().string(); 
-
-            JSONObject jsonObject = new JSONObject(stringResponse);        
-            JSONObject infos = jsonObject.getJSONObject("info");
-            BigDecimal rate = infos.getBigDecimal("rate");
-            
-            list.add(new Currencies(i+1,currencies[i],rate));
-        }
         
-        return list;
+        
+        task = new Task<ObservableList<Currencies>>(){
+            
+            
+            @Override
+            protected ObservableList<Currencies> call() throws Exception{
+                for(int i=0; i < currencies.length; i++){
+                    String urlString = "https://api.exchangerate.host/convert?from="+ currencies[i] +"&to=PLN&amount=1";
+
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                        .url(urlString)
+                        .get()
+                        .build();
+
+                    Response response = client.newCall(request).execute();
+                    String stringResponse = response.body().string(); 
+
+                    JSONObject jsonObject = new JSONObject(stringResponse);        
+                    JSONObject infos = jsonObject.getJSONObject("info");
+                    BigDecimal rate = infos.getBigDecimal("rate");
+
+                    list.add(new Currencies(i+1,currencies[i],rate));
+                }
+                return list;
+            }
+        };
+        
+        table.setItems(list);
     }
     
     
     @FXML
     private void calculateCurrency() throws IOException {
         
-        BigDecimal amount = BigDecimal.valueOf(Double.valueOf(calculateFrom.getText()));
-        
         if(calculateFrom.getText().isEmpty()){
             rates.setText("Uzupełnij pole");
             return;
         }
+        if(calculateFromList.getSelectionModel().isEmpty() && calculateToList.getSelectionModel().isEmpty()){
+            rates.setText("Wybierz waluty");
+            return;
+        }
         
+        BigDecimal amount = BigDecimal.valueOf(Double.valueOf(calculateFrom.getText()));
         
         String listConvertTo = calculateToList.getValue();        
         String listConvertFrom = calculateFromList.getValue();
@@ -113,20 +130,12 @@ public class PrimaryController {
         
         rates.setText("1 " + listConvertFrom + " = "+String.format("%.2f",rate)+ " " + listConvertTo);
         
-        calculateTo.setText(String.format("%.2f",calculatedCurrency));
-        
-        
+        calculateTo.setText(String.format("%.2f",calculatedCurrency));   
     }
     
     @FXML
     private void getCurrenciesData() throws IOException {
-        tableLp.setCellValueFactory(new PropertyValueFactory<>("lp"));
-        tableCurrency.setCellValueFactory(new PropertyValueFactory<>("currencies"));
-        tableRate.setCellValueFactory(new PropertyValueFactory<>("rate"));
-
-        ObservableList<Currencies> list = getCurrencies();
-        
-        table.setItems(list);
+        new Thread(task).start();
     }
     
     @FXML

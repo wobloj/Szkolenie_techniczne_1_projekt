@@ -105,7 +105,7 @@
                                  <children>
                                     <Label fx:id="loadingInfo" text="Załadowanie danych może troche potrwać">
                                        <VBox.margin>
-                                          <Insets bottom="30.0" />
+                                          <Insets bottom="10.0" />
                                        </VBox.margin>
                                     </Label>
                                     <Button mnemonicParsing="false" onAction="#getCurrenciesData" prefHeight="37.0" prefWidth="113.0" stylesheets="@styles/style.css" text="Przeładuj dane">
