@@ -9,7 +9,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 /* CSS */
 .root {
-  -fx-background: white;
+    -fx-background: white;
+    -fx-font-family: Roboto;
 }
 
 .button {
