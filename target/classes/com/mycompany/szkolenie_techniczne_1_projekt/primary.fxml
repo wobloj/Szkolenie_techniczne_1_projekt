@@ -28,9 +28,6 @@
         </rowConstraints>
          <children>
               <Button fx:id="secondaryButton" onAction="#startExchange" prefHeight="50.0" prefWidth="216.0" styleClass="button-62" stylesheets="@styles/style.css" text="Zacznij wymieniać!" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-               <font>
-                  <Font name="Roboto Bold" size="16.0" />
-               </font>
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>

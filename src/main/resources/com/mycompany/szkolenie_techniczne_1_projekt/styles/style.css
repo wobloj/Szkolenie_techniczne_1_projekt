@@ -8,21 +8,112 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 */
 
 /* CSS */
+
 .root {
     -fx-background: white;
     -fx-font-family: Roboto;
 }
+
+/*Buttons*/
 
 .button {
     -fx-background-color: white;
     -fx-text-fill: black;
     -fx-background-radius: 0px;
     -fx-border-color: black;
+    -fx-font-size:15px;
+    
 }
 
 .button:hover{
-    -fx-border-color: #ff6600;
-    -fx-text-fill: #ff6600;
+    -fx-border-color: #359696;
+    -fx-text-fill: #359696;
 }
 
+/*Combo box*/
+
+.combo-box{
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.combo-box-base{
+    -fx-background-color:white;
+    -fx-border-color:black;
+}
+.combo-box-base:focused{
+    -fx-border-color:#359696;
+}
+
+.combo-box .list-view{
+    -fx-background-color: white;
+    -fx-border-color: #359696;
+    
+}
+
+.combo-box .list-cell{
+    -fx-background-color: white;
+    -fx-padding:5px 5px 5px 15px;
+}
+
+.combo-box .list-cell:hover,
+.combo-box .list-cell:selected{
+    -fx-text-fill: #359696;
+}
+
+/*Text field*/
+
+.text-field{
+    -fx-background-radius:1em;    
+    -fx-border-radius:1em;
+    -fx-alignment: center;
+    -fx-background-color: #FAF9F6;
+    -fx-border-color:black;
+}
+.text-field:focused{
+    -fx-border-color:#359696;
+}
+
+/*Tab pane*/
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color:#FAF9F6;
+}
+
+.tab .tab-label { 
+    -fx-text-fill: black;
+}
+
+.tab:selected .tab-label { 
+    -fx-text-fill: #359696;
+}
+
+/*Table view*/
+
+.table-view{
+    -fx-border-color:#359696;
+}
+
+.table-view:row-selection{
+    -fx-bacground-color:#359696;
+    -fx-text-fill:black;
+}
+
+.table-view .column-header{
+    -fx-background-color: #FAF9F6;
+    -fx-alignment:CENTER;
+    -fx-border-style: hidden hidden solid hidden;
+    -fx-border-color:#359696;
+    -fx-border-width:1px;
+}
+.table-view .table-cell{
+    -fx-alignment:CENTER;
+}
+
+/*Return Button*/
+
+.back:hover{
+    -fx-scale-x:1.3;
+    -fx-scale-y:1.3;
+}
 

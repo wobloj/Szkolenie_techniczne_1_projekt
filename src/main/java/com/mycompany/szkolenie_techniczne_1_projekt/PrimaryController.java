@@ -5,8 +5,6 @@ import java.math.BigDecimal;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -23,7 +21,7 @@ import org.json.JSONObject;
 public class PrimaryController {
 
     @FXML
-    private ComboBox<String> calculateFromList, calculateToList;
+    private ComboBox<String> calculateFromList, calculateToList, calculateToTableList;
     @FXML
     private TextField calculateFrom, calculateTo;
     @FXML
@@ -36,61 +34,31 @@ public class PrimaryController {
     private TableColumn<Currencies, String> tableCurrency;
     @FXML
     private TableColumn<Currencies, BigDecimal> tableRate;    
+    @FXML
+    private ProgressIndicator progress;
     
     private Task<ObservableList<Currencies>> task;
     
-    public String[] currencies = { "JPY", "CNY", "SDG", "RON", "MKD", "MXN", "CAD",
-        "ZAR", "AUD", "NOK", "ILS", "ISK", "SYP", "LYD", "UYU", "YER", "CSD",
-        "EEK", "THB", "IDR", "LBP", "AED", "BOB", "QAR", "BHD", "HNL", "HRK",
-        "COP", "ALL", "DKK", "MYR", "SEK", "RSD", "BGN", "DOP", "KRW", "LVL",
-        "VEF", "CZK", "TND", "KWD", "VND", "JOD", "NZD", "PAB", "CLP", "PEN",
-        "GBP", "DZD", "CHF", "RUB", "UAH", "ARS", "SAR", "EGP", "INR", "PYG",
-        "TWD", "TRY", "BAM", "OMR", "SGD", "MAD", "BYR", "NIO", "HKD", "LTL",
-        "SKK", "GTQ", "BRL", "EUR", "HUF", "IQD", "CRC", "PHP", "SVC", "PLN",
-        "USD" };
+    public String[] currencies = { "JPY", "CNY", "SDG", "RON", "MKD", "MXN", 
+        "CAD", "ZAR", "AUD", "NOK", "ILS", "ISK", "SYP", "LYD", "UYU", "YER",
+        "THB", "IDR", "LBP", "AED", "BOB", "QAR", "BHD", "HNL", "HRK", "COP",
+        "ALL", "DKK", "MYR", "SEK", "RSD", "BGN", "DOP", "KRW", "CZK", "TND",
+        "KWD", "VND", "JOD", "NZD", "PAB", "CLP", "PEN", "GBP", "DZD", "CHF",
+        "RUB", "UAH", "ARS", "SAR", "EGP", "INR", "PYG", "TWD", "TRY", "BAM", 
+        "OMR", "SGD", "MAD", "NIO", "HKD", "GTQ", "BRL", "EUR", "HUF", "IQD",
+        "CRC", "PHP", "SVC", "PLN", "USD" };
     
     @FXML
-    public void initialize() throws IOException{
+    public void initialize(){
         
         calculateFromList.setItems(FXCollections.observableArrayList(currencies).sorted());
         calculateToList.setItems(FXCollections.observableArrayList(currencies).sorted());
-
+        calculateToTableList.setItems(FXCollections.observableArrayList(currencies).sorted());
+        
         tableLp.setCellValueFactory(new PropertyValueFactory<>("lp"));
         tableCurrency.setCellValueFactory(new PropertyValueFactory<>("currencies"));
         tableRate.setCellValueFactory(new PropertyValueFactory<>("rate"));
-        
-        ObservableList<Currencies> list = FXCollections.observableArrayList();
-        
-        
-        
-        task = new Task<ObservableList<Currencies>>(){
-            
-            
-            @Override
-            protected ObservableList<Currencies> call() throws Exception{
-                for(int i=0; i < currencies.length; i++){
-                    String urlString = "https://api.exchangerate.host/convert?from="+ currencies[i] +"&to=PLN&amount=1";
-
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder()
-                        .url(urlString)
-                        .get()
-                        .build();
-
-                    Response response = client.newCall(request).execute();
-                    String stringResponse = response.body().string(); 
-
-                    JSONObject jsonObject = new JSONObject(stringResponse);        
-                    JSONObject infos = jsonObject.getJSONObject("info");
-                    BigDecimal rate = infos.getBigDecimal("rate");
-
-                    list.add(new Currencies(i+1,currencies[i],rate));
-                }
-                return list;
-            }
-        };
-        
-        table.setItems(list);
+         
     }
     
     
@@ -135,6 +103,81 @@ public class PrimaryController {
     
     @FXML
     private void getCurrenciesData() throws IOException {
+        if(calculateToTableList.getSelectionModel().isEmpty()){
+            return;
+        }
+        ObservableList<Currencies> list = FXCollections.observableArrayList();
+
+        
+        task = new Task<ObservableList<Currencies>>(){
+
+            @Override
+            protected ObservableList<Currencies> call() throws Exception{
+//                for(int i=0; i < currencies.length; i++){
+//                    if(currencies[i].equals(calculateToTableList.getValue())){
+//                        continue;
+//                    }
+//                    
+//                    String urlString = "https://api.exchangerate.host/convert?from="+ currencies[i] +"&to="+calculateToTableList.getValue()+"&amount=1";
+//
+//                    OkHttpClient client = new OkHttpClient();
+//                    Request request = new Request.Builder()
+//                        .url(urlString)
+//                        .get()
+//                        .build();
+//
+//                    Response response = client.newCall(request).execute();
+//                    String stringResponse = response.body().string(); 
+//
+//                    JSONObject jsonObject = new JSONObject(stringResponse);        
+//                    JSONObject infos = jsonObject.getJSONObject("info");
+//                    BigDecimal rate = infos.getBigDecimal("rate");
+//                    
+//                    progress.setProgress(((float)i+1)/currencies.length);
+//                    
+//                    System.out.println((((float)i+1)/currencies.length)* 100);
+//                    list.add(new Currencies(i+1,currencies[i],rate));
+//                }
+
+                int i=0, lp=0;
+                while(lp < currencies.length){
+                    if(currencies[i].equals(calculateToTableList.getValue())){
+                        System.out.println("TAKIE SAME!!");
+                        i++;
+                        continue;
+                    }
+                    
+                    lp++;
+                    
+                    String urlString = "https://api.exchangerate.host/convert?from="+ currencies[i] +"&to="+calculateToTableList.getValue()+"&amount=1";
+
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                        .url(urlString)
+                        .get()
+                        .build();
+
+                    Response response = client.newCall(request).execute();
+                    String stringResponse = response.body().string(); 
+
+                    JSONObject jsonObject = new JSONObject(stringResponse);        
+                    JSONObject infos = jsonObject.getJSONObject("info");
+                    BigDecimal rate = infos.getBigDecimal("rate");
+                    
+                    progress.setProgress(((float)lp+1)/currencies.length);
+                    
+                    System.out.println((((float)lp+1)/currencies.length)* 100);
+                    list.add(new Currencies(lp,currencies[i],rate));
+                    i++;
+                }
+                return list;
+            }
+        };
+        tableRate.setText("Aktualna cena w "+calculateToTableList.getValue());
+        table.setItems(list);
+        
+        
+        
         new Thread(task).start();
     }
     
