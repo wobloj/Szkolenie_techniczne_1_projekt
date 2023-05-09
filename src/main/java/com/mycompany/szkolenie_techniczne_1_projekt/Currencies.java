@@ -45,6 +45,4 @@ public class Currencies {
     public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
-  
-
 }

@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -18,7 +19,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
 
-public class PrimaryController {
+public class PrimaryController extends TextFieldFunctions{
 
     @FXML
     private ComboBox<String> calculateFromList, calculateToList, calculateToTableList;
@@ -36,6 +37,8 @@ public class PrimaryController {
     private TableColumn<Currencies, BigDecimal> tableRate;    
     @FXML
     private ProgressIndicator progress;
+    @FXML
+    private Button getDataToTable;
     
     private Task<ObservableList<Currencies>> task;
     
@@ -48,6 +51,8 @@ public class PrimaryController {
         "OMR", "SGD", "MAD", "NIO", "HKD", "GTQ", "BRL", "EUR", "HUF", "IQD",
         "CRC", "PHP", "SVC", "PLN", "USD" };
     
+    
+    
     @FXML
     public void initialize(){
         
@@ -58,15 +63,22 @@ public class PrimaryController {
         tableLp.setCellValueFactory(new PropertyValueFactory<>("lp"));
         tableCurrency.setCellValueFactory(new PropertyValueFactory<>("currencies"));
         tableRate.setCellValueFactory(new PropertyValueFactory<>("rate"));
-         
+        
+        setOnlyNumericTextField(calculateFrom);
+        calculateTo.setEditable(false);
     }
     
+    @FXML
+    public void copyToClipboard(){
+        oneClickCopy(calculateTo);
+        
+    }
     
     @FXML
     private void calculateCurrency() throws IOException {
         
         if(calculateFrom.getText().isEmpty()){
-            rates.setText("Uzupełnij pole");
+            rates.setText("Uzupełnij pola");
             return;
         }
         if(calculateFromList.getSelectionModel().isEmpty() && calculateToList.getSelectionModel().isEmpty()){
@@ -81,6 +93,7 @@ public class PrimaryController {
         
         String urlString = "https://api.exchangerate.host/convert?from="+ listConvertFrom +"&to="+ listConvertTo +"&amount="+ amount;
         
+        
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
             .url(urlString)
@@ -89,7 +102,8 @@ public class PrimaryController {
 
         
         Response response = client.newCall(request).execute();
-        String stringResponse = response.body().string(); 
+        String stringResponse = response.body().string();
+        
         
         JSONObject jsonObject = new JSONObject(stringResponse);        
         JSONObject infos = jsonObject.getJSONObject("info");
@@ -106,51 +120,29 @@ public class PrimaryController {
         if(calculateToTableList.getSelectionModel().isEmpty()){
             return;
         }
+        
         ObservableList<Currencies> list = FXCollections.observableArrayList();
-
+        
         
         task = new Task<ObservableList<Currencies>>(){
-
+            
             @Override
             protected ObservableList<Currencies> call() throws Exception{
-//                for(int i=0; i < currencies.length; i++){
-//                    if(currencies[i].equals(calculateToTableList.getValue())){
-//                        continue;
-//                    }
-//                    
-//                    String urlString = "https://api.exchangerate.host/convert?from="+ currencies[i] +"&to="+calculateToTableList.getValue()+"&amount=1";
-//
-//                    OkHttpClient client = new OkHttpClient();
-//                    Request request = new Request.Builder()
-//                        .url(urlString)
-//                        .get()
-//                        .build();
-//
-//                    Response response = client.newCall(request).execute();
-//                    String stringResponse = response.body().string(); 
-//
-//                    JSONObject jsonObject = new JSONObject(stringResponse);        
-//                    JSONObject infos = jsonObject.getJSONObject("info");
-//                    BigDecimal rate = infos.getBigDecimal("rate");
-//                    
-//                    progress.setProgress(((float)i+1)/currencies.length);
-//                    
-//                    System.out.println((((float)i+1)/currencies.length)* 100);
-//                    list.add(new Currencies(i+1,currencies[i],rate));
-//                }
 
                 int i=0, lp=0;
                 while(lp < currencies.length){
                     if(currencies[i].equals(calculateToTableList.getValue())){
-                        System.out.println("TAKIE SAME!!");
                         i++;
                         continue;
+                    }
+                    if(isCancelled()){
+                        break;
                     }
                     
                     lp++;
                     
                     String urlString = "https://api.exchangerate.host/convert?from="+ currencies[i] +"&to="+calculateToTableList.getValue()+"&amount=1";
-
+                    
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
                         .url(urlString)
@@ -160,25 +152,28 @@ public class PrimaryController {
                     Response response = client.newCall(request).execute();
                     String stringResponse = response.body().string(); 
 
-                    JSONObject jsonObject = new JSONObject(stringResponse);        
+                    JSONObject jsonObject = new JSONObject(stringResponse);      
                     JSONObject infos = jsonObject.getJSONObject("info");
                     BigDecimal rate = infos.getBigDecimal("rate");
                     
                     progress.setProgress(((float)lp+1)/currencies.length);
-                    
-                    System.out.println((((float)lp+1)/currencies.length)* 100);
+                        
                     list.add(new Currencies(lp,currencies[i],rate));
+                    
                     i++;
                 }
+                
                 return list;
             }
         };
+        
         tableRate.setText("Aktualna cena w "+calculateToTableList.getValue());
         table.setItems(list);
         
+        Thread loadTable = new Thread(task);
         
+        loadTable.start();
         
-        new Thread(task).start();
     }
     
     @FXML

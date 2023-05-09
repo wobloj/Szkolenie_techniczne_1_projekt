@@ -17,7 +17,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 /*Buttons*/
 
 .button {
-    -fx-background-color: white;
+    -fx-background-color: #FAF9F6;
     -fx-text-fill: black;
     -fx-background-radius: 0px;
     -fx-border-color: black;
