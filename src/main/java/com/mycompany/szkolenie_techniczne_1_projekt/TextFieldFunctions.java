@@ -32,6 +32,5 @@ public class TextFieldFunctions {
         ClipboardContent content = new ClipboardContent();
         content.putString(textfield.getText());
         clipboard.setContent(content);
-        System.out.println("Copied");
     }
 }

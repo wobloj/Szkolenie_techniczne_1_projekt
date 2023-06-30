@@ -44,7 +44,7 @@
                            <children>
                               <ComboBox fx:id="calculateFromList" prefWidth="150.0" promptText="Przelicz z" stylesheets="@styles/style.css" visibleRowCount="5" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                               <ComboBox fx:id="calculateToList" prefWidth="150.0" promptText="Przelicz na" styleClass="combo-box" stylesheets="@styles/style.css" visibleRowCount="5" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                              <TextField fx:id="calculateFrom" GridPane.rowIndex="2">
+                              <TextField fx:id="calculateFrom" promptText="Ilość Waluty" GridPane.rowIndex="2">
                                  <GridPane.margin>
                                     <Insets left="20.0" right="20.0" />
                                  </GridPane.margin>
@@ -52,7 +52,7 @@
                                     <Font name="Roboto" size="14.0" />
                                  </font>
                               </TextField>
-                              <TextField fx:id="calculateTo" onMouseClicked="#copyToClipboard" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                              <TextField fx:id="calculateTo" onMouseClicked="#copyToClipboard" promptText="Wynik" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                  <GridPane.margin>
                                     <Insets left="20.0" right="20.0" />
                                  </GridPane.margin>
@@ -116,6 +116,7 @@
                               <VBox alignment="BOTTOM_CENTER" prefHeight="373.0" prefWidth="231.0">
                                  <children>
                                     <ComboBox fx:id="calculateToTableList" prefWidth="150.0" promptText="Wybierz walute" stylesheets="@styles/style.css" translateY="-100.0" />
+                                    <Label fx:id="validationInfo" />
                                     <ProgressIndicator fx:id="progress" progress="0.0">
                                        <VBox.margin>
                                           <Insets bottom="10.0" />

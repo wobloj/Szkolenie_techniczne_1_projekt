@@ -2,6 +2,7 @@ package com.mycompany.szkolenie_techniczne_1_projekt;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -14,6 +15,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Duration;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -26,7 +28,7 @@ public class PrimaryController extends TextFieldFunctions{
     @FXML
     private TextField calculateFrom, calculateTo;
     @FXML
-    private Label rates;
+    private Label rates, validationInfo;
     @FXML
     private TableView<Currencies> table;
     @FXML
@@ -70,8 +72,15 @@ public class PrimaryController extends TextFieldFunctions{
     
     @FXML
     public void copyToClipboard(){
+        if(calculateTo.getText().isEmpty()){
+            return;
+        }
+        String prevText = rates.getText();
         oneClickCopy(calculateTo);
-        
+        rates.setText("Skopiowano!");
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(e -> rates.setText(prevText));
+        pause.play();
     }
     
     @FXML
@@ -79,10 +88,16 @@ public class PrimaryController extends TextFieldFunctions{
         
         if(calculateFrom.getText().isEmpty()){
             rates.setText("Uzupełnij pola");
+            PauseTransition pause = new PauseTransition(Duration.seconds(1));
+            pause.setOnFinished(e -> rates.setText(null));
+            pause.play();
             return;
         }
         if(calculateFromList.getSelectionModel().isEmpty() && calculateToList.getSelectionModel().isEmpty()){
             rates.setText("Wybierz waluty");
+            PauseTransition pause = new PauseTransition(Duration.seconds(1));
+            pause.setOnFinished(e -> rates.setText(null));
+            pause.play();
             return;
         }
         
@@ -118,6 +133,10 @@ public class PrimaryController extends TextFieldFunctions{
     @FXML
     private void getCurrenciesData() throws IOException {
         if(calculateToTableList.getSelectionModel().isEmpty()){
+            validationInfo.setText("Wybierz walute!");
+            PauseTransition pause = new PauseTransition(Duration.seconds(1));
+            pause.setOnFinished(e -> validationInfo.setText(null));
+            pause.play();
             return;
         }
         
@@ -134,9 +153,6 @@ public class PrimaryController extends TextFieldFunctions{
                     if(currencies[i].equals(calculateToTableList.getValue())){
                         i++;
                         continue;
-                    }
-                    if(isCancelled()){
-                        break;
                     }
                     
                     lp++;
@@ -156,24 +172,20 @@ public class PrimaryController extends TextFieldFunctions{
                     JSONObject infos = jsonObject.getJSONObject("info");
                     BigDecimal rate = infos.getBigDecimal("rate");
                     
-                    progress.setProgress(((float)lp+1)/currencies.length);
-                        
+                    progress.setProgress(((float)lp+1)/currencies.length); 
                     list.add(new Currencies(lp,currencies[i],rate));
                     
                     i++;
                 }
-                
                 return list;
             }
         };
-        
         tableRate.setText("Aktualna cena w "+calculateToTableList.getValue());
         table.setItems(list);
         
         Thread loadTable = new Thread(task);
         
         loadTable.start();
-        
     }
     
     @FXML
