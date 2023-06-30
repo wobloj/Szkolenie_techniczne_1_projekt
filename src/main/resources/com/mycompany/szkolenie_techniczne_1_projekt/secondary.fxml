@@ -116,7 +116,11 @@
                               <VBox alignment="BOTTOM_CENTER" prefHeight="373.0" prefWidth="231.0">
                                  <children>
                                     <ComboBox fx:id="calculateToTableList" prefWidth="150.0" promptText="Wybierz walute" stylesheets="@styles/style.css" translateY="-100.0" />
-                                    <Label fx:id="validationInfo" />
+                                    <Label fx:id="validationInfo">
+                                       <VBox.margin>
+                                          <Insets bottom="30.0" />
+                                       </VBox.margin>
+                                    </Label>
                                     <ProgressIndicator fx:id="progress" progress="0.0">
                                        <VBox.margin>
                                           <Insets bottom="10.0" />
